@@ -15,12 +15,12 @@ Depends:
    R (>= 3.5)
 Imports:
   cluster,
-  knitr,
   MASS,
   purrr,
   stats
 Suggests:
   glmnet,
+  knitr,
   nnet
 Roxygen: list(markdown=TRUE)
 VignetteBuilder: knitr

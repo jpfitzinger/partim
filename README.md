@@ -105,8 +105,8 @@ and $\mathbf{x}$ is an $n\times k$ matrix of features.
 
 Now let $\mathbb{A}^i_{\ell} \in \{1,...,k\}$ be a set that contains $i$
 and is the $\ell\text{th}$ node in a hierarchical graph of the features.
-For instance, if $k=8$, $\mathbb{A} = \{\mathbb{A}^i_j\}$ could be given
-by
+For instance, if $k=8$, $\mathbb{A}^1 = `\{\mathbb{A}^1_j\}`$ could be
+given by
 
 $$
 \mathbb{A}^1 = 

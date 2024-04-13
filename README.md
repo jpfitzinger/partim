@@ -85,11 +85,12 @@ allocates importance to each cluster using one of 3 available methods
 
 ## Methodology
 
-The Shapley regression calculates the importance of the $i$th feature,
-$\gamma_i$, by fitting a linear regression of the dependent variable $y$
-on every possible subset of features and computing the average increase
-in $R^2$ achieved by adding feature $i$ to each subset that excludes
-$i$. This approach is feasible only for small values of $k$.
+The Shapley regression calculates the importance of the $i \text{th}$
+feature, $\gamma_i$, by fitting a linear regression of the dependent
+variable $y$ on every possible subset of features and computing the
+average increase in $R^2$ achieved by adding feature $i$ to each subset
+that excludes $i$. This approach is feasible only for small values of
+$k$.
 
 Partition importance reduces the dimensionality of the problem by
 calculating recursive coalition importance values for the predicted
@@ -102,9 +103,10 @@ $$
 where $\mathcal{f}(\cdot)$ is an arbitrary linear or nonlinear function,
 and $\mathbf{x}$ is an $n\times k$ matrix of features.
 
-Now let $\mathbb{A}^i_\ell \in \{1,...,k\}$ be a set that contains $i$
-and is the $\ell$th node in a hierarchical graph of the features. For
-instance, if $k=8$, $\mathbb{A} = \{\mathbb{A}^i_j\}$ could be given by
+Now let $\mathbb{A}^i_{\ell} \in \{1,...,k\}$ be a set that contains $i$
+and is the $\ell\text{th}$ node in a hierarchical graph of the features.
+For instance, if $k=8$, $\mathbb{A} = \{\mathbb{A}^i_j\}$ could be given
+by
 
 $$
 \mathbb{A}^1 = 
@@ -116,9 +118,9 @@ $$
 \end{cases}
 $$
 
-Furthermore, let $\mathbb{B}^i_\ell$ be the complementary set at each
+Furthermore, let $\mathbb{B}^i_{\ell}$ be the complementary set at each
 level in the hierarchy defined as
-$\mathbb{A}^i_{\ell-1}\setminus\mathbb{A}^i_\ell$, so that
+$\mathbb{A}^i_{\ell-1}\setminus\mathbb{A}^i_{\ell}$, so that
 
 $$
 \mathbb{B}^1 = 

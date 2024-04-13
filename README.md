@@ -103,18 +103,18 @@ $$
 where $\mathcal{f}(\cdot)$ is an arbitrary linear or nonlinear function,
 and $\mathbf{x}$ is an $n\times k$ matrix of features.
 
-Now let $\mathbb{A}^i_{\ell} \in \{1,...,k\}$ be a set that contains $i$
-and is the $\ell\text{th}$ node in a hierarchical graph of the features.
-For instance, if $k=8$, $\mathbb{A}^1 = `\{\mathbb{A}^1_j\}`$ could be
-given by
+Now let $\mathbb{A}^i_{\ell} \in \lbrace1,...,k\rbrace$ be a set that
+contains $i$ and is the $\ell\text{th}$ node in a hierarchical graph of
+the features. For instance, if $k=8$,
+$\mathbb{A}^1 = \lbrace\mathbb{A}^1_j\rbrace$ could be given by
 
 $$
 \mathbb{A}^1 = 
 \begin{cases}
-\mathbb{A}^1_0 : \{1,2,3,4,5,6,7,8\}\\
-\mathbb{A}^1_1 : \{1,2,3,4\}\\
-\mathbb{A}^1_2 : \{1,2\}\\
-\mathbb{A}^1_3 : \{1\}
+\mathbb{A}^1_0 : \lbrace1,2,3,4,5,6,7,8\rbrace\\
+\mathbb{A}^1_1 : \lbrace1,2,3,4\rbrace\\
+\mathbb{A}^1_2 : \lbrace1,2\rbrace\\
+\mathbb{A}^1_3 : \lbrace1\rbrace
 \end{cases}
 $$
 
@@ -125,17 +125,17 @@ $\mathbb{A}^i_{\ell-1}\setminus\mathbb{A}^i_{\ell}$, so that
 $$
 \mathbb{B}^1 = 
 \begin{cases}
-\mathbb{B}^1_0 : \{\}\\
-\mathbb{B}^1_1 : \{5,6,7,8\}\\
-\mathbb{B}^1_2 : \{3,4\}\\
-\mathbb{B}^1_3 : \{2\}
+\mathbb{B}^1_0 : \lbrace\rbrace\\
+\mathbb{B}^1_1 : \lbrace5,6,7,8\rbrace\\
+\mathbb{B}^1_2 : \lbrace3,4\rbrace\\
+\mathbb{B}^1_3 : \lbrace2\rbrace
 \end{cases}
 $$
 
 At the $\ell$th level, the importance of features $\mathbb{A}^i_\ell$ is
 computed using the $R^2$ of a regression of $\hat{y}_\ell^a$ on
 $\mathbf{x}_a$, where $\mathbf{x}_a$ is shorthand to denote a matrix of
-$\{1,...,k\}\setminus \mathbb{B}_\ell^a$ feature values and
+$\lbrace1,...,k\rbrace\setminus \mathbb{B}_\ell^a$ feature values and
 $\hat{y}_\ell^a$ is defined below. Let this $R^2$ be denoted by
 $r_\ell^a$.
 

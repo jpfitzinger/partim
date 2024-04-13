@@ -21,7 +21,7 @@ explained.
 
 The most theoretically sound approach to decomposing explained variance
 in a linear regression is the Shapley regression (typically referred to
-as “LMG” in `R` packages implementing the technique[^1]). However, the
+as “LMG” in `R` packages that implement the technique[^1]). However, the
 LMG method is computationally complex with an $\mathcal{O}(2^k)$ runtime
 where $k$ is the number of features. Furthermore, LMG is limited to the
 *linear* regression context with no implementation for regularized or
@@ -32,6 +32,10 @@ This package makes two contributions:
 1.  It provides a fast approximation of LMG that uses graph partitioning
     with an $\mathcal{O}(k^2)$ runtime
 2.  It is generalizable to nonlinear and regularized regression models
+
+The proposed approach reduces the dimensionality of the model-space
+using hierarchical clustering and graph-corrected nested coalition
+Shapley values for each feature.
 
 ## Installation
 
@@ -67,38 +71,89 @@ imp <- partim(x, y)
 allocates importance to each cluster using one of 3 available methods
 (see [Methodology](#methodology) for a more detailed discussion):
 
-1.  `method = "tree_entropy"` (the default) allocates to each cluster
-    its unique variance contribution and divides any *common* variance
-    contribution based on the entropy of common component loadings in
-    the clusters. This adjusts for the potentially unbalanced structure
-    of the hierarchical graph and approximates LMG values. The approach
-    is equal to `tree_lmg` when a balanced hierarchical graph is used.
-2.  `method = "tree_lmg"` allocates to each cluster its unique variance
-    contribution and divides any *common* variance contribution equally
-    among the clusters. This is exactly the LMG approach, but with a
-    structural bias due to the hierarchical tree. It works best with
-    balanced partition trees (a discussion of different partition trees
-    follows below).
-3.  `method = "tree_pmvd"` allocates to each cluster its unique variance
-    contribution and divides any *common* variance contribution in
-    proportion to the unique contributions. This is the so-called
+1.  `method = "tree_entropy"` (the default) is a graph-based
+    approximation of the Shapley regression (LMG importance) but adjusts
+    for unbalanced tree structures using the entropy of common component
+    loadings in the clusters. The approach is equal to `tree_lmg` when a
+    balanced hierarchical graph is used.
+2.  `method = "tree_lmg"` is a direct graph-based approximation of the
+    Shapley regression without adjustments. It consequently works best
+    with balanced trees.
+3.  `method = "tree_pmvd"` is a graph-based approximation of the
     “proportional marginal variance decomposition” (PMVD) approach
     (Feldman 2005).
 
 ## Methodology
 
-Let $y$ be a dependent variable with $n$ observations and $\mathbf{x}$
-be an $n\times k$ matrix of $k$ independent features. Suppose a
-regression is estimated such that
+The Shapley regression calculates the importance of the $i$th feature,
+$\gamma_i$, by fitting a linear regression of the dependent variable $y$
+on every possible subset of features and computing the average increase
+in $R^2$ achieved by adding feature $i$ to each subset that excludes
+$i$. This approach is feasible only for small values of $k$.
+
+Partition importance reduces the dimensionality of the problem by
+calculating recursive coalition importance values for the predicted
+values $\hat{y}$. Suppose a regression is estimated such that
 
 $$
-\hat{y} = \mathcal{f}(\mathbf{x}).
+\hat{y} = \mathcal{f}(\mathbf{x}),
 $$
 
-Now $\mathbf{x}$ is split into two groups $\mathbf{x}_a$ and
-$\mathbf{x}_b$ and the importance of each group of features ($\gamma_a$
-and $\gamma_b$) is calculated by decomposing the variance of $\hat{y}$,
-which guarantees that $\gamma_a+\gamma_b=1$.
+where $\mathcal{f}(\cdot)$ is an arbitrary linear or nonlinear function,
+and $\mathbf{x}$ is an $n\times k$ matrix of features.
+
+Now let $\mathbb{A}^i_\ell \in \{1,...,k\}$ be a set that contains $i$
+and is the $\ell$th node in a hierarchical graph of the features. For
+instance, if $k=8$, $\mathbb{A} = \{\mathbb{A}^i_j\}$ could be given by
+
+$$
+\mathbb{A}^1 = 
+\begin{cases}
+\mathbb{A}^1_0 : \{1,2,3,4,5,6,7,8\}\\
+\mathbb{A}^1_1 : \{1,2,3,4\}\\
+\mathbb{A}^1_2 : \{1,2\}\\
+\mathbb{A}^1_3 : \{1\}
+\end{cases}
+$$
+
+Furthermore, let $\mathbb{B}^i_\ell$ be the complementary set at each
+level in the hierarchy defined as
+$\mathbb{A}^i_{\ell-1}\setminus\mathbb{A}^i_\ell$, so that
+
+$$
+\mathbb{B}^1 = 
+\begin{cases}
+\mathbb{B}^1_0 : \{\}\\
+\mathbb{B}^1_1 : \{5,6,7,8\}\\
+\mathbb{B}^1_2 : \{3,4\}\\
+\mathbb{B}^1_3 : \{2\}
+\end{cases}
+$$
+
+At the $\ell$th level, the importance of features $\mathbb{A}^i_\ell$ is
+computed using the $R^2$ of a regression of $\hat{y}_\ell^a$ on
+$\mathbf{x}_a$, where $\mathbf{x}_a$ is shorthand to denote a matrix of
+$\{1,...,k\}\setminus \mathbb{B}_\ell^a$ feature values and
+$\hat{y}_\ell^a$ is defined below. Let this $R^2$ be denoted by
+$r_\ell^a$.
+
+Now the importance of features $\mathbb{A}^i_\ell$ is given by
+
+$$
+\gamma^a_\ell = \omega r_\ell^a + (1-\omega) (1 - r_\ell^b).
+$$
+
+$\hat{y}_\ell^a$ is defined to ensure that
+$\gamma_\ell^a + \gamma_\ell^b = 1$, by setting
+
+$$
+\hat{y}_\ell^a = \omega \mathcal{f}(\mathbf{x}_a) + (1 - \omega)(\hat{y}_{\ell-1}^a - \mathcal{f}(\mathbf{x}_b)).
+$$
+
+$\omega$ is the weight that allocates the common variation of
+$\mathbf{x}_a$ and $\mathbf{x}_b$ between the importance values. In the
+case of the Shapley regression, $\omega = 0.5$, while in the case of
+PMVD $\omega = \frac{1-r_\ell^b}{2-r_\ell^a-r_\ell^b}$.
 
 ## Custom clustering
 

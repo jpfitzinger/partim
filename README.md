@@ -132,30 +132,31 @@ $$
 \end{cases}
 $$
 
-At the $\ell$th level, the importance of features $\mathbb{A}^i_\ell$ is
-computed using the $R^2$ of a regression of $\hat{y}_\ell^a$ on
-$\mathbf{x}_a$, where $\mathbf{x}_a$ is shorthand to denote a matrix of
-$\lbrace1,...,k\rbrace\setminus \mathbb{B}_\ell^a$ feature values and
-$\hat{y}_\ell^a$ is defined below. Let this $R^2$ be denoted by
-$r_\ell^a$.
+At the $\ell\text{th}$ level, the importance of features
+$\mathbb{A}^i_{\ell}$ is computed using the $R^2$ of a regression of
+$\hat{y}_{\ell}^a$ on $\mathbf{x}_a$, where $\mathbf{x}_a$ is shorthand
+to denote a matrix of
+$\lbrace 1,...,k\rbrace\setminus \mathbb{B}_{\ell}^a$ feature values and
+$\hat{y}_{\ell}^a$ is defined below. Let this $R^2$ be denoted by
+$r_{\ell}^a$.
 
-Now the importance of features $\mathbb{A}^i_\ell$ is given by
-
-$$
-\gamma^a_\ell = \omega r_\ell^a + (1-\omega) (1 - r_\ell^b).
-$$
-
-$\hat{y}_\ell^a$ is defined to ensure that
-$\gamma_\ell^a + \gamma_\ell^b = 1$, by setting
+Now the importance of features $\mathbb{A}^i_{\ell}$ is given by
 
 $$
-\hat{y}_\ell^a = \omega \mathcal{f}(\mathbf{x}_a) + (1 - \omega)(\hat{y}_{\ell-1}^a - \mathcal{f}(\mathbf{x}_b)).
+\gamma^a_{\ell} = \omega r_{\ell}^a + (1-\omega) (1 - r_{\ell}^b).
+$$
+
+$\hat{y}_{\ell}^a$ is defined to ensure that
+$\gamma_{\ell}^a + \gamma_{\ell}^b = 1$, by setting
+
+$$
+\hat{y}_{\ell}^a = \omega \mathcal{f}(\mathbf{x}_a) + (1 - \omega)(\hat{y}_{\ell-1}^a - \mathcal{f}(\mathbf{x}_b)).
 $$
 
 $\omega$ is the weight that allocates the common variation of
 $\mathbf{x}_a$ and $\mathbf{x}_b$ between the importance values. In the
 case of the Shapley regression, $\omega = 0.5$, while in the case of
-PMVD $\omega = \frac{1-r_\ell^b}{2-r_\ell^a-r_\ell^b}$.
+PMVD $\omega = \frac{1-r_{\ell}^b}{2-r_{\ell}^a-r_{\ell}^b}$.
 
 ## Custom clustering
 

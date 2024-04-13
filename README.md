@@ -8,15 +8,16 @@
 ![CRAN](https://img.shields.io/cran/v/partim?label=CRAN)
 <!-- badges: end -->
 
-`partim` is an `R` package to compute relative importance for linear and
-nonlinear regression models using a graph partitioning approach that
-approximates Shapley regression values. The **relative importance** of
-features in a regression measures the **contribution of each feature to
-the model prediction**. When the goodness-of-fit of a model is measured
-using $R^2$ (i.e. the percentage of target variance explained by the
-model), then meaningful importance values should provide an additive
-decomposition of $R^2$, such that a feature’s importance represents that
-feature’s percentage of target variance explained.
+`partim` is an `R` package to compute model-agnostic relative importance
+for linear and nonlinear regression models using a graph partitioning
+approach that approximates Shapley regression values. The **relative
+importance** of features in a regression measures the **contribution of
+each feature to the model prediction**. When the goodness-of-fit of a
+model is measured using $R^2$ (i.e. the percentage of target variance
+explained by the model), then meaningful importance values should
+provide an additive decomposition of $R^2$, such that a feature’s
+importance represents that feature’s percentage of target variance
+explained.
 
 The most theoretically sound approach to decomposing explained variance
 in a linear regression is the Shapley regression (typically referred to
@@ -50,24 +51,28 @@ The `partim` function computes importance values and can take `formula`
 and `data` arguments or `x` and `y` arguments:
 
 ``` r
+# formula syntax
 data <- MASS::Boston
 imp <- partim(medv ~ ., data)
 
 # ---- OR ----
 
+# 'x' and 'y' syntax
 x <- data[, 1:13]
 y <- data[, 14]
 imp <- partim(x, y)
 ```
 
 `partim` recursively splits the features (`x`) into clusters and
-allocates importance to each cluster using one of 3 available methods:
+allocates importance to each cluster using one of 3 available methods
+(see [Methodology](#methodology) for a more detailed discussion):
 
 1.  `method = "tree_entropy"` (the default) allocates to each cluster
     its unique variance contribution and divides any *common* variance
     contribution based on the entropy of common component loadings in
     the clusters. This adjusts for the potentially unbalanced structure
-    of the hierarchical graph and approximates LMG values.
+    of the hierarchical graph and approximates LMG values. The approach
+    is equal to `tree_lmg` when a balanced hierarchical graph is used.
 2.  `method = "tree_lmg"` allocates to each cluster its unique variance
     contribution and divides any *common* variance contribution equally
     among the clusters. This is exactly the LMG approach, but with a
@@ -80,27 +85,42 @@ allocates importance to each cluster using one of 3 available methods:
     “proportional marginal variance decomposition” (PMVD) approach
     (Feldman 2005).
 
+## Methodology
+
+Let $y$ be a dependent variable with $n$ observations and $\mathbf{x}$
+be an $n\times k$ matrix of $k$ independent features. Suppose a
+regression is estimated such that
+
+$$
+\hat{y} = \mathcal{f}(\mathbf{x}).
+$$
+
+Now $\mathbf{x}$ is split into two groups $\mathbf{x}_a$ and
+$\mathbf{x}_b$ and the importance of each group of features ($\gamma_a$
+and $\gamma_b$) is calculated by decomposing the variance of $\hat{y}$,
+which guarantees that $\gamma_a+\gamma_b=1$.
+
 ## Custom clustering
 
 How features are split into clusters can be controlled using the
-`fCluster` argument. This argument takes a function that has a single
+`splitter` argument. This argument takes a function that has a single
 input `x` and returns a vector of cluster allocations. `partim` provides
-an example wrapper method with the same name, which facilitates
+an example wrapper method called `fSplit`, which facilitates
 pre-packaged correlation-based clustering with the `cluster` package
 (Maechler et al. 2022):
 
 ``` r
 # A balanced single-linkage tree
-cl <- fCluster(type = "agnes", method = "single", balanced = TRUE)
-imp_sl <- partim(medv ~ ., data, method = "tree_lmg", fCluster = cl)
+splt <- fSplit(type = "agnes", method = "single", balanced = TRUE)
+imp_sl <- partim(medv ~ ., data, method = "tree_lmg", splitter = splt)
 
 # Correlation-based Divisive Analysis (the default)
-cl <- fCluster(type = "diana")
-imp_da <- partim(medv ~ ., data, fCluster = cl)
+splt <- fSplit(type = "diana")
+imp_da <- partim(medv ~ ., data, splitter = splt)
 
 # Partitioning around medoids
-cl <- fCluster(type = "pam")
-imp_pam <- partim(medv ~ ., data, fCluster = cl)
+splt <- fSplit(type = "pam")
+imp_pam <- partim(medv ~ ., data, splitter = splt)
 ```
 
 As seen on the plot below, the choice of clustering algorithms can have

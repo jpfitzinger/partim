@@ -134,8 +134,8 @@ $$
 
 At the $\ell\text{th}$ level, the importance of features
 $\mathbb{A}^i_{\ell}$ is computed using the $R^2$ of a regression of
-$\hat{y}_{\ell}^a$ on $\mathbf{x}_a$, where $\mathbf{x}_a$ is shorthand
-to denote a matrix of
+$\hat{y}_{\ell}^{a}$ on $\mathbf{x}_a$, where $\mathbf{x}_a$ is
+shorthand to denote a matrix of
 $\lbrace 1,...,k\rbrace\setminus \mathbb{B}_{\ell}^a$ feature values and
 $\hat{y}_{\ell}^a$ is defined below. Let this $R^2$ be denoted by
 $r_{\ell}^a$.
